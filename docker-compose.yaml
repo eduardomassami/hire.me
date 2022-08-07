@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  bemobi:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: euchida/bemobi:latest
+    container_name: bemobi
+    networks:
+      - bemobinet
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0.30
+    command: --innodb-use-native-aio=0
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - ./mysql:/var/lib/mysql
+      # - ./init.sql:/docker-entrypoint-initdb.d:rw
+    environment:
+      - MYSQL_DATABASE=bemobi
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - bemobinet
+
+networks:
+  bemobinet:
+    driver: bridge
