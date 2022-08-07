@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "74ee9beb-599f-4434-b833-d1ef93be1daa",
+		"name": "Hire.me",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "282951"
+	},
+	"item": [
+		{
+			"name": "Get Most Used",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/retrieve",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"retrieve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get By Alias",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/retrieve/teste3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"retrieve",
+						"teste3"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save With Custom Alias",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/create?url=http://globo.com&CUSTOM_ALIAS=teste3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "http://globo.com"
+						},
+						{
+							"key": "CUSTOM_ALIAS",
+							"value": "teste3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save No Custom Alias",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/create?url=http://yahoo.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create"
+					],
+					"query": [
+						{
+							"key": "url",
+							"value": "http://yahoo.com"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
