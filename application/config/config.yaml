@@ -1,0 +1,13 @@
+# Database settings
+database:
+  user: root
+  password: root
+  address: db
+  port: 3306
+  name: bemobi
+  timeout: 180
+
+# Server settings
+server:
+  host: "localhost"
+  port: ":8080"
