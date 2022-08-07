@@ -56,54 +56,20 @@ func (h *handler) GetMostUsed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&u)
 }
 
-func (h *handler) SaveNoCustomAlias(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	w.Header().Set("Content-Type", "application/json")
-
-	url := r.URL.Query().Get("url")
-	uuid := uuid.NewString()
-	fmt.Println(uuid)
-	us := &domain.URL{}
-	us.URL = url
-	us.Alias = uuid
-
-	err := h.urlService.SaveNoCustomAlias(us)
-
-	if err != nil {
-
-		if strings.Contains(err.Error(), "Duplicate entry") {
-			r := domain.ErrorResponse{}
-			r.Alias = uuid
-			r.ERR_Code = "001"
-			r.Description = "CUSTOM ALIAS ALREADY EXISTS"
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(r)
-			return
-		}
-
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		return
-	}
-
-	sr := domain.SaveSuccesResponse{}
-	sr.Alias = uuid
-	sr.Url = r.Host + "/retrieve/" + uuid
-	sr.Original = url
-	sr.Statistics.TimeTaken = fmt.Sprintf("%dms", time.Since(start).Milliseconds())
-	json.NewEncoder(w).Encode(sr)
-}
-
-func (h *handler) SaveWithCustomAlias(w http.ResponseWriter, r *http.Request) {
+func (h *handler) Save(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	w.Header().Set("Content-Type", "application/json")
 
 	url := r.URL.Query().Get("url")
 	alias := r.URL.Query().Get("CUSTOM_ALIAS")
+	if alias == "" {
+		alias = uuid.NewString()
+	}
 	us := domain.URL{}
 	us.URL = url
 	us.Alias = alias
 
-	err := h.urlService.SaveWithCustomAlias(&us)
+	err := h.urlService.Save(&us)
 
 	if err != nil {
 
@@ -117,7 +83,7 @@ func (h *handler) SaveWithCustomAlias(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusBadGateway), http.StatusBadGateway)
 		return
 	}
 

@@ -13,3 +13,5 @@
 
 # Dependency directories (remove the comment below to include it)
 config.yaml
+
+__debug_bin

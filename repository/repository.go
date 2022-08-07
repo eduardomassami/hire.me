@@ -35,18 +35,28 @@ func NewURLRepositoryDb(user, password, address, port, name string, timeout int)
 	return &URLRepositoryDb{sqlClient}, nil
 }
 
-func (d URLRepositoryDb) Get(alias string) ([]*domain.URL, error) {
-	urlSql := "SELECT Alias, URL from URLS WHERE ALIAS = ?"
-	return newGetQuery(d, urlSql, alias)
+func (d URLRepositoryDb) Get(alias string) (*[]domain.URL, error) {
+	urlSql := "SELECT ALIAS, URL, RETRIEVAL_COUNT from URLS WHERE ALIAS = ?"
+	result, err := newGetQuery(d, urlSql, alias)
+	if err == nil {
+		(*result)[0].RetrievalCount = (*result)[0].RetrievalCount + 1
+		updateSql := "UPDATE URLS SET `RETRIEVAL_COUNT` = ? WHERE ALIAS = ?"
+		_, e := d.client.Exec(updateSql, (*result)[0].RetrievalCount, alias)
+		if e != nil {
+			fmt.Printf(e.Error())
+		}
+	}
+
+	return result, err
 }
 
-func (d URLRepositoryDb) GetMostUsed() ([]*domain.URL, error) {
-	urlSql := "SELECT TOP (10) Alias, URL from URLS ORDER BY ACCESS"
+func (d URLRepositoryDb) GetMostUsed() (*[]domain.URL, error) {
+	urlSql := "SELECT ALIAS, URL, RETRIEVAL_COUNT from URLS ORDER BY RETRIEVAL_COUNT DESC limit 10"
 	return newGetQuery(d, urlSql, "")
 }
 
 func (d URLRepositoryDb) Save(url *domain.URL) error {
-	urlSql := `INSERT INTO URLS(Alias, URL) VALUES(?, ?)`
+	urlSql := `INSERT INTO URLS(ALIAS, URL) VALUES(?, ?)`
 	_, err := d.client.Exec(urlSql,
 		url.Alias,
 		url.URL,
@@ -55,33 +65,40 @@ func (d URLRepositoryDb) Save(url *domain.URL) error {
 	return err
 }
 
-func newGetQuery(d URLRepositoryDb, urlSql, alias string) ([]*domain.URL, error) {
+func newGetQuery(d URLRepositoryDb, urlSql, alias string) (*[]domain.URL, error) {
 	var url domain.URL
 
-	res, err := d.client.Query(urlSql, alias)
+	var res *sql.Rows
+	var err error
+	if alias != "" {
+		res, err = d.client.Query(urlSql, alias)
+	} else {
+		res, err = d.client.Query(urlSql)
+	}
 
 	if err != nil {
 		return nil, errors.New("fail to get URL")
 	}
 
-	var urls []*domain.URL
+	var urls []domain.URL
 
 	for res.Next() {
 
 		err := res.Scan(
 			&url.Alias,
 			&url.URL,
+			&url.RetrievalCount,
 		)
 
 		if err != nil {
 			return nil, errors.New("fail to get URL")
 		}
-		urls = append(urls, &url)
+		urls = append(urls, url)
 	}
 
 	if len(urls) == 0 {
 		return nil, errors.New("URL NOT FOUND")
 	}
 
-	return urls, nil
+	return &urls, nil
 }

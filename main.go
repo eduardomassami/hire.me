@@ -36,10 +36,7 @@ func main() {
 
 	r.Get("/retrieve/{alias}", handler.Get)
 	r.Get("/retrieve", handler.GetMostUsed)
-	r.Put("/create/alias", handler.SaveWithCustomAlias)
-	r.Put("/create", handler.SaveNoCustomAlias)
-	// r.Put("/create?url={url}&CUSTOM_ALIAS={alias}", handler.SaveWithCustomAlias)
-	// r.Put("/create?url={url}", handler.SaveNoCustomAlias)
+	r.Put("/create", handler.Save)
 
 	log.Print(fmt.Sprintf("Starting server on %s:%s ...", conf.Server.Host, conf.Server.Port))
 	log.Fatal(http.ListenAndServe(conf.Server.Port, r))
