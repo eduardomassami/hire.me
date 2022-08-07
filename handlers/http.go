@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/eduardomassami/hime.me/domain"
 	"github.com/go-chi/chi/v5"
@@ -56,6 +57,7 @@ func (h *handler) GetMostUsed(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) SaveNoCustomAlias(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	w.Header().Set("Content-Type", "application/json")
 
 	url := r.URL.Query().Get("url")
@@ -82,10 +84,17 @@ func (h *handler) SaveNoCustomAlias(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	// json.NewEncoder(w).Encode(&u)
+
+	sr := domain.SaveSuccesResponse{}
+	sr.Alias = uuid
+	sr.Url = r.Host + "/retrieve/" + uuid
+	sr.Original = url
+	sr.Statistics.TimeTaken = fmt.Sprintf("%dms", time.Since(start).Milliseconds())
+	json.NewEncoder(w).Encode(sr)
 }
 
 func (h *handler) SaveWithCustomAlias(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	w.Header().Set("Content-Type", "application/json")
 
 	url := r.URL.Query().Get("url")
@@ -111,5 +120,11 @@ func (h *handler) SaveWithCustomAlias(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-	// json.NewEncoder(w).Encode(&u)
+
+	sr := domain.SaveSuccesResponse{}
+	sr.Alias = alias
+	sr.Url = r.Host + "/retrieve/" + alias
+	sr.Original = url
+	sr.Statistics.TimeTaken = fmt.Sprintf("%dms", time.Since(start).Milliseconds())
+	json.NewEncoder(w).Encode(sr)
 }
