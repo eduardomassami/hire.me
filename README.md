@@ -31,7 +31,7 @@ Theres a Postman Collection for you to import and use to test the api [Postman C
 
 ***Get By Alias***: request returns a previous saved URL, just replace the teste3 after retrive/ with a valid alias.
 
-***Save With Custom Alias***: request to save a URL, the is automatically created. Check the Query Params
+***Save With Custom Alias***: request to save a URL, the alias automatically created. Check the Query Params
 
 
 ***Save No Custom Alias***: request to save a URL with a predefined alias. Check the Query Params
