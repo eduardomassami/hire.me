@@ -7,21 +7,26 @@ services:
       dockerfile: Dockerfile
     image: euchida/bemobi:latest
     container_name: bemobi
+    ports:
+      - "8080:8080"
     networks:
       - bemobinet
     depends_on:
       - db
 
   db:
-    image: mysql:8.0.30
-    command: --innodb-use-native-aio=0
+    image: mysql:5.7
     container_name: db
+    command: --innodb-use-native-aio=0
+    ports:
+      - "8081:3306"
     restart: always
     tty: true
     volumes:
       - ./mysql:/var/lib/mysql
-      # - ./init.sql:/docker-entrypoint-initdb.d:rw
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
+      - MYSQL_PASSWORD=root
       - MYSQL_DATABASE=bemobi
       - MYSQL_ROOT_PASSWORD=root
     networks:
