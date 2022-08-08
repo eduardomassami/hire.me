@@ -39,11 +39,13 @@ func (d URLRepositoryDb) Get(alias string) (*[]domain.URL, error) {
 	urlSql := "SELECT ALIAS, URL, RETRIEVAL_COUNT from URLS WHERE ALIAS = ?"
 	result, err := newGetQuery(d, urlSql, alias)
 	if err == nil {
-		(*result)[0].RetrievalCount = (*result)[0].RetrievalCount + 1
-		updateSql := "UPDATE URLS SET `RETRIEVAL_COUNT` = ? WHERE ALIAS = ?"
-		_, e := d.client.Exec(updateSql, (*result)[0].RetrievalCount, alias)
-		if e != nil {
-			fmt.Printf(e.Error())
+		for i := 0; i < len(*result); i++ {
+			(*result)[i].RetrievalCount = (*result)[i].RetrievalCount + 1
+			updateSql := "UPDATE URLS SET `RETRIEVAL_COUNT` = ? WHERE ALIAS = ?"
+			_, e := d.client.Exec(updateSql, (*result)[i].RetrievalCount, alias)
+			if e != nil {
+				fmt.Printf(e.Error())
+			}
 		}
 	}
 
